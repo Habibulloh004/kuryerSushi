@@ -3,11 +3,12 @@ import { Logo } from "../assets/index";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const { setAuthUser } = useAuthContext()
+  const { setAuthUser } = useAuthContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,14 +18,23 @@ const Login = () => {
     };
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API}/login`,
+        `https://sushiserver.onrender.com/login`,
         formData
       );
       localStorage.setItem("chat-user", JSON.stringify(response.data));
-      setAuthUser(response.data)
+      localStorage.setItem(
+        "date",
+        JSON.stringify({
+          expiresAt: Date.now() + 5 * 24 * 60 * 60 * 1000, // 5 days in milliseconds
+        })
+      );
+
+      setAuthUser(response.data);
+      <Navigate to="/" />;
+      console.log(response.data);
     } catch (error) {
       console.error(`Error: front ${error}`);
-      toast.error("User not found")
+      toast.error("User not found");
     } finally {
       setLoading(false);
     }
