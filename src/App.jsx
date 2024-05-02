@@ -12,7 +12,7 @@ import { AiOutlineMenu } from "react-icons/ai";
 
 function App() {
   const { authUser } = useAuthContext();
-  const [openNav, setOpenNav] = useState(false)
+  const [openNav, setOpenNav] = useState(false);
   const path = useLocation();
   useEffect(() => {
     const item = JSON.parse(localStorage.getItem("date"));
@@ -61,13 +61,26 @@ function App() {
           />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-        <div className="fixed bottom-5 right-5 z-[999]">
-          <AiOutlineMenu className="w-5 h-5" onClick={() => setOpenNav(prev => !prev)} />
-          <article className={`absolute w-40 text-center text-sm bottom-0 right-10 flex gap-3 bg-primary/50 p-2 flex-col text-white rounded-md ${openNav ? "block": "hidden"}`}>
-            <Link onClick={() => openNav(false)} to={`/`}>Заказы</Link>
-            <Link onClick={() => openNav(false)} to={`/history-orders`}>История заказов</Link>
-          </article>
-        </div>
+        {path.pathname == "/login" ? null : (
+          <div className="fixed bottom-5 right-5 z-[999]">
+            <AiOutlineMenu
+              className="w-5 h-5"
+              onClick={() => setOpenNav((prev) => !prev)}
+            />
+            <article
+              className={`absolute w-40 text-center text-sm bottom-0 right-10 flex gap-3 bg-primary/50 p-2 flex-col text-white rounded-md ${
+                openNav ? "block" : "hidden"
+              }`}
+            >
+              <Link onClick={() => openNav(false)} to={`/`}>
+                Заказы
+              </Link>
+              <Link onClick={() => openNav(false)} to={`/history-orders`}>
+                История заказов
+              </Link>
+            </article>
+          </div>
+        )}
       </div>
       <Toaster />
     </>
