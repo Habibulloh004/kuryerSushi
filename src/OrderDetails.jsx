@@ -19,7 +19,9 @@ const OrderDetails = () => {
   const [openMap, setOpenMap] = useState(true);
   const [loading, setLoading] = useState(false);
   const findOrder = async () => {
-    const { data } = await axios.get(`${import.meta.env.VITE_API}/findOrder/${id}`);
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_API}/findOrder/${id}`
+    );
     setMyOrder(data);
     fetchSpot();
   };
@@ -35,7 +37,9 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchOneOrder = async () => {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_BACK}/get_order/${myOrder?.orderData?.transaction_comment}`
+        `${import.meta.env.VITE_BACK}/get_order/${
+          myOrder?.orderData?.transaction_comment
+        }`
       );
       setBackOrder(data);
     };
@@ -93,6 +97,12 @@ const OrderDetails = () => {
         const mongoChange = await axios.delete(
           `${import.meta.env.VITE_API}/deleteOrder/${+id}`
         );
+        const deleteBack = await axios.delete(
+          `${import.meta.env.VITE_BACK}/delete_order/${
+            orderData && +orderData?.transaction_comment
+          }`
+        );
+        console.log("del", deleteBack.data);
         console.log("mon", mongoChange.data);
         console.log("res", resStatus.data);
         setMyOrder({ ...myOrder, status: "delivery" });
@@ -192,9 +202,9 @@ const OrderDetails = () => {
                 </ol>
               </span>
               <div className="price font-normal text-base flex flex-col gap-2">
-                <span>Итого: {f(+backOrder?.all_price / 100 )} сум</span>
+                <span>Итого: {f(+backOrder?.all_price / 100)} сум</span>
                 <span>Бонусы: {f(+backOrder?.payed_bonus / 100)} сум</span>
-                <span>К оплате: {f(+backOrder?.payed_sum / 100 )} сум</span>
+                <span>К оплате: {f(+backOrder?.payed_sum / 100)} сум</span>
                 <span>Доставка: {f(10000)} сум</span>
               </div>
             </section>
