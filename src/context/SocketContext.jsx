@@ -16,7 +16,7 @@ export const SocketContextProvider = ({ children }) => {
     if (authUser) {
       const socket = io(import.meta.env.VITE_API, {
         query: {
-          userId: authUser._id,
+          userId: authUser.user_id,
         },
       });
 
@@ -31,6 +31,22 @@ export const SocketContextProvider = ({ children }) => {
     }
   }, [authUser]);
 
+  useEffect(() => {
+    if(socket) {
+      socket.on('connect', function() {
+        console.log('connected', socket.connected);
+      });
+      
+      socket.on("message", (data) => {
+        console.log("message");
+        console.log(data);
+      })
+      socket.on("disconnect", () => {
+        console.log("disconect");
+      })
+    }
+    
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={{ socket }}>

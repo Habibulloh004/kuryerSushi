@@ -14,3 +14,4 @@ export const sideBarItems = [
     }
 ]
 
+export const f = new Intl.NumberFormat("en-EN").format;

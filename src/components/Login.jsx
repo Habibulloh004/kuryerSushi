@@ -18,7 +18,7 @@ const Login = () => {
     };
     try {
       const response = await axios.post(
-        `https://sushiserver.onrender.com/login`,
+        `${import.meta.env.VITE_API}/login`,
         formData
       );
       localStorage.setItem("chat-user", JSON.stringify(response.data));
@@ -31,10 +31,9 @@ const Login = () => {
 
       setAuthUser(response.data);
       <Navigate to="/" />;
-      console.log(response.data);
     } catch (error) {
       console.error(`Error: front ${error}`);
-      toast.error("User not found");
+      toast.error("Пользователь не найден");
     } finally {
       setLoading(false);
     }
