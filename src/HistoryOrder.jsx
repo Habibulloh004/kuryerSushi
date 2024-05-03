@@ -60,6 +60,7 @@ const HistoryOrder = () => {
     );
   }
 
+  console.log(myOrder);
   return (
     <main>
       <div className="container w-10/12 mx-auto mt-6 h-[85dvh]">
@@ -76,7 +77,9 @@ const HistoryOrder = () => {
             <section className="mt-5 flex flex-col gap-2 text-lg font-bold">
               <p className="">
                 Филиал:{" "}
-                <span className="font-normal">{findSpotName?.name ? findSpotName?.name : "Loading..."}</span>
+                <span className="font-normal">
+                  {findSpotName?.name ? findSpotName?.name : "Loading..."}
+                </span>
               </p>
               <p className="">
                 Номер клиента:{" "}
@@ -97,7 +100,7 @@ const HistoryOrder = () => {
                 <p>Товары:</p>
                 <ol className="list-decimal my-2 mx-2 text-sm font-normal">
                   {myOrder?.products.map((prod, idx) => {
-                    const findProductName = myOrder?.products_name.find(
+                    const findProductName = myOrder?.products_name?.find(
                       (item) => item.product_id == prod.product_id
                     );
                     return (
@@ -110,9 +113,35 @@ const HistoryOrder = () => {
                 </ol>
               </span>
               <div className="price font-normal text-base flex flex-col gap-2">
-                <span>Итого: {f(+myOrder?.backOrder?.all_price / 100)} сум</span>
-                <span>Бонусы: {f(+myOrder?.backOrder?.payed_bonus / 100)} сум</span>
-                <span>К оплате: {f(+myOrder?.backOrder?.payed_sum / 100)} сум</span>
+                <span>
+                  Итого:{" "}
+                  {f(
+                    myOrder.backOrder
+                      ? myOrder?.backOrder?.all_price / 100
+                      : myOrder.sum / 100
+                  )}{" "}
+                  сум
+                </span>
+                <span>
+                  Бонусы:{" "}
+                  {f(
+                    myOrder.backOrder
+                      ? myOrder?.backOrder?.payed_bonus / 100
+                      : myOrder.payed_bonus / 100
+                  )}{" "}
+                  сум
+                </span>
+                <span>
+                  К оплате:{" "}
+                  {f(
+                    myOrder.backOrder
+                      ? myOrder?.backOrder?.payed_sum / 100
+                      : (Number(myOrder.payed_cash) +
+                          Number(myOrder.payed_card)) /
+                          100
+                  )}{" "}
+                  сум
+                </span>
                 <span>Доставка: {f(10000)} сум</span>
               </div>
             </section>

@@ -8,6 +8,9 @@ const Order = () => {
   const { authUser } = useAuthContext();
   const { socket } = useSocketContext();
   const [newOrders, setNewOrders] = useState(null);
+  useEffect(() => {
+    localStorage.removeItem("history-orders")
+  }, [])
   const fetchOrders = async () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_API}/getOrders/${authUser?.user_id}`

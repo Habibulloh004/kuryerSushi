@@ -41,6 +41,7 @@ const OrderDetails = () => {
           myOrder?.orderData?.transaction_comment
         }`
       );
+      console.log(data);
       setBackOrder(data);
     };
 
@@ -97,12 +98,12 @@ const OrderDetails = () => {
         const mongoChange = await axios.delete(
           `${import.meta.env.VITE_API}/deleteOrder/${+id}`
         );
-        const deleteBack = await axios.delete(
-          `${import.meta.env.VITE_BACK}/delete_order/${
-            orderData && +orderData?.transaction_comment
-          }`
-        );
-        console.log("del", deleteBack.data);
+        // const deleteBack = await axios.delete(
+        //   `${import.meta.env.VITE_BACK}/delete_order/${
+        //     orderData && +orderData?.transaction_comment
+        //   }`
+        // );
+        // console.log("del", deleteBack.data);
         console.log("mon", mongoChange.data);
         console.log("res", resStatus.data);
         setMyOrder({ ...myOrder, status: "delivery" });

@@ -1,7 +1,13 @@
 import { Toaster } from "react-hot-toast";
 import Login from "./components/Login";
 import Dashboard from "./Dashboard";
-import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { useAuthContext } from "./context/AuthContext";
 import { useEffect, useState } from "react";
 import OrderDetails from "./OrderDetails";
@@ -68,7 +74,7 @@ function App() {
               onClick={() => setOpenNav((prev) => !prev)}
             />
             <article
-              className={`absolute w-40 text-center text-sm bottom-0 right-10 flex gap-3 bg-primary/50 p-2 flex-col text-white rounded-md ${
+              className={`absolute w-44 text-center text-sm bottom-0 right-10 flex gap-3 bg-primary/50 p-2 flex-col text-white rounded-md ${
                 openNav ? "block" : "hidden"
               }`}
             >
@@ -78,6 +84,29 @@ function App() {
               <Link onClick={() => openNav(false)} to={`/history-orders`}>
                 История заказов
               </Link>
+              <span
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }}
+                className="flex items-center justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
+                  />
+                </svg>
+                <p className="ml-1">Выйти из аккаунта</p>
+              </span>
             </article>
           </div>
         )}
