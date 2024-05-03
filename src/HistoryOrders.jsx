@@ -24,7 +24,6 @@ const HistoryOrders = () => {
       );
       setDateOrders(products.data);
       setLoading(false);
-      console.log(products.data);
       localStorage.setItem("history-orders", JSON.stringify(products.data));
       localStorage.setItem("input", JSON.stringify(date))
     } catch (e) {

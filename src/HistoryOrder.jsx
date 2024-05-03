@@ -10,8 +10,6 @@ const HistoryOrder = () => {
   const { id } = useParams();
   const [spots, setSpots] = useState([]);
   const [myOrder, setMyOrder] = useState(null);
-  const [orderData, setOrderData] = useState(null);
-  const [backOrder, setBackOrder] = useState(null);
   const network = useNetworkState();
   const navigate = useNavigate();
 
@@ -22,20 +20,6 @@ const HistoryOrder = () => {
       )
     );
   }, []);
-
-  const fetchOneOrder = async () => {
-    const { data } = await axios.get(
-      `${import.meta.env.VITE_BACK}/get_order/${myOrder?.transaction_comment}`
-    );
-    setBackOrder(data);
-  };
-
-  useEffect(() => {
-    if (myOrder) {
-      setOrderData(myOrder);
-      fetchOneOrder();
-    }
-  }, [myOrder]);
 
   const fetchSpot = async () => {
     const { data } = await axios.get(`${import.meta.env.VITE_API}/getSpot`);
@@ -50,7 +34,7 @@ const HistoryOrder = () => {
     (item) => item?.spot_id == +myOrder?.spot_id
   );
 
-  if (!spots || !myOrder || !orderData || !backOrder) {
+  if (!spots || !myOrder) {
     return (
       <div className="h-[500px] w-full justify-center flex items-center">
         <div role="status">
@@ -92,27 +76,27 @@ const HistoryOrder = () => {
             <section className="mt-5 flex flex-col gap-2 text-lg font-bold">
               <p className="">
                 Филиал:{" "}
-                <span className="font-normal">{findSpotName?.name}</span>
+                <span className="font-normal">{findSpotName?.name ? findSpotName?.name : "Loading..."}</span>
               </p>
               <p className="">
                 Номер клиента:{" "}
                 <a
                   className="font-normal"
-                  href={`tel:${orderData?.client_phone?.replace(/\s/g, "")}`}
+                  href={`tel:${myOrder?.client_phone?.replace(/\s/g, "")}`}
                 >
-                  {orderData?.client_phone}
+                  {myOrder?.client_phone}
                 </a>
               </p>
               <p className="text-ellipsis whitespace-nowrap w-full overflow-hidden">
                 Адрес клиента: <br />{" "}
                 <span className="font-normal">
-                  {orderData?.delivery.address1}
+                  {myOrder?.delivery.address1}
                 </span>
               </p>
               <span>
                 <p>Товары:</p>
                 <ol className="list-decimal my-2 mx-2 text-sm font-normal">
-                  {orderData?.products.map((prod, idx) => {
+                  {myOrder?.products.map((prod, idx) => {
                     const findProductName = myOrder?.products_name.find(
                       (item) => item.product_id == prod.product_id
                     );
@@ -126,9 +110,9 @@ const HistoryOrder = () => {
                 </ol>
               </span>
               <div className="price font-normal text-base flex flex-col gap-2">
-                <span>Итого: {f(+backOrder?.all_price / 100)} сум</span>
-                <span>Бонусы: {f(+backOrder?.payed_bonus / 100)} сум</span>
-                <span>К оплате: {f(+backOrder?.payed_sum / 100)} сум</span>
+                <span>Итого: {f(+myOrder?.backOrder?.all_price / 100)} сум</span>
+                <span>Бонусы: {f(+myOrder?.backOrder?.payed_bonus / 100)} сум</span>
+                <span>К оплате: {f(+myOrder?.backOrder?.payed_sum / 100)} сум</span>
                 <span>Доставка: {f(10000)} сум</span>
               </div>
             </section>
