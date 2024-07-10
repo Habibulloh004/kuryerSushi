@@ -246,12 +246,12 @@ const OrderDetails = () => {
             </div>
             {orderData?.delivery.lat && orderData?.delivery.lng && (
               <div
-                className={`w-[100%] h-[200px] ${openMap ? "block" : "hidden"}`}
+                className={`w-[100%] h-[300px] ${openMap ? "block" : "hidden"}`}
               >
                 <MapContainer
                   center={[orderData?.delivery?.lat, orderData?.delivery?.lng]}
                   zoom={14}
-                  style={{ width: "100%", height: "100%" }}
+                  style={{ width: "100%", height: "80%" }}
                 >
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

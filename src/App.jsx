@@ -68,7 +68,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         {path.pathname == "/login" ? null : (
-          <div className="fixed bottom-5 right-5 z-[999]">
+          <div className="fixed bottom-5 right-5 z-[99999999]">
             <AiOutlineMenu
               className="w-5 h-5"
               onClick={() => setOpenNav((prev) => !prev)}
