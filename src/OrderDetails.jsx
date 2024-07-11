@@ -38,7 +38,9 @@ const OrderDetails = () => {
     const fetchOneOrder = async () => {
       const { data } = await axios.get(
         `${import.meta.env.VITE_BACK}/get_order/${
-          myOrder?.orderData?.transaction_comment ? myOrder?.orderData?.transaction_comment : myOrder.order_id
+          myOrder?.orderData?.transaction_comment
+            ? myOrder?.orderData?.transaction_comment
+            : myOrder.order_id
         }`
       );
       console.log(data);
@@ -131,7 +133,7 @@ const OrderDetails = () => {
   console.log(orderData);
   console.log(backOrder);
 
-  if (!spots || !myOrder || !orderData || !backOrder) {
+  if (!spots || !myOrder || !orderData) {
     return (
       <div className="h-[500px] w-full justify-center flex items-center">
         <div role="status">
@@ -155,6 +157,14 @@ const OrderDetails = () => {
         </div>
       </div>
     );
+  }
+
+  Number.prototype.percentage = function (percent) {
+    return (this * percent) / 100;
+  };
+
+  function calculatePercentage(number, percent) {
+    return (number * percent) / 100;
   }
 
   return (
@@ -207,9 +217,39 @@ const OrderDetails = () => {
                 </ol>
               </span>
               <div className="price font-normal text-base flex flex-col gap-2">
-                <span>Итого: {f(+backOrder?.all_price / 100)} сум</span>
-                <span>Бонусы: {f(+backOrder?.payed_bonus / 100)} сум</span>
-                <span>К оплате: {f(+backOrder?.payed_sum / 100)} сум</span>
+                <span>
+                  Итого:{" "}
+                  {backOrder
+                    ? f(+backOrder?.all_price / 100)
+                    : f(
+                        (Number(orderData.sum) -
+                          Number(orderData.delivery.delivery_price)) /
+                          100
+                      )}{" "}
+                  сум
+                </span>
+                <span>
+                  Бонусы: {backOrder ? f(+backOrder?.payed_bonus / 100) : "-"}{" "}
+                  сум
+                </span>
+                <span>
+                  К оплате:{" "}
+                  {backOrder
+                    ? f(+backOrder?.payed_sum / 100)
+                    : f(
+                        (Number(orderData.sum) -
+                          Number(orderData.delivery.delivery_price)) /
+                          100 -
+                          calculatePercentage(
+                            (Number(orderData.sum) -
+                              Number(orderData.delivery.delivery_price)) /
+                              100,
+                            Number(orderData.discount || 1)
+                          ) +
+                          Number(orderData.delivery.delivery_price)
+                      )}{" "}
+                  сум
+                </span>
                 <span>Доставка: {f(10000)} сум</span>
               </div>
             </section>
