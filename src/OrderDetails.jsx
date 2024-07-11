@@ -38,7 +38,7 @@ const OrderDetails = () => {
     const fetchOneOrder = async () => {
       const { data } = await axios.get(
         `${import.meta.env.VITE_BACK}/get_order/${
-          myOrder?.orderData?.transaction_comment
+          myOrder?.orderData?.transaction_comment ? myOrder?.orderData?.transaction_comment : myOrder.order_id
         }`
       );
       console.log(data);
@@ -126,6 +126,10 @@ const OrderDetails = () => {
       "https://as1.ftcdn.net/v2/jpg/07/00/28/16/1000_F_700281654_r9dsHGGMdHRuqshtB5DQ4qOSzQzOamqW.webp",
     iconSize: [30, 30],
   });
+  console.log(spots);
+  console.log(myOrder);
+  console.log(orderData);
+  console.log(backOrder);
 
   if (!spots || !myOrder || !orderData || !backOrder) {
     return (
