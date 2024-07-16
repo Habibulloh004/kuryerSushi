@@ -250,6 +250,16 @@ const OrderDetails = () => {
                       )}{" "}
                   сум
                 </span>
+
+                <span>
+                  Тип оплаты:{" "}
+                  {backOrder
+                    ? backOrder?.payment == "cash"
+                      ? "Наличными"
+                      : "Карта"
+                    : "-"}{" "}
+                </span>
+
                 <span>Доставка: {f(10000)} сум</span>
               </div>
             </section>

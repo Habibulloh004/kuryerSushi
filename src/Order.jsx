@@ -3,28 +3,45 @@ import OrderList from "./OrderList";
 import axios from "axios";
 import { useAuthContext } from "./context/AuthContext";
 import { useSocketContext } from "./context/SocketContext";
+import toast from "react-hot-toast";
+import notice from "../public/notice.mp3";
 
 const Order = () => {
   const { authUser } = useAuthContext();
   const { socket } = useSocketContext();
   const [newOrders, setNewOrders] = useState(null);
   useEffect(() => {
-    localStorage.removeItem("history-orders")
-  }, [])
+    localStorage.removeItem("history-orders");
+  }, []);
   const fetchOrders = async () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_API}/getOrders/${authUser?.user_id}`
     );
+    console.log(data);
     setNewOrders(data);
   };
 
   useEffect(() => {
-    if (socket) {
-      socket.on("message", (data) => {
-        console.log(data);
-        setNewOrders((prev) => [...prev, data]);
-      });
-    }
+    const handleMessage = (data) => {
+      console.log(data);
+      setNewOrders((prev) => [...prev, data]);
+      toast.success("Новый заказ");
+      const sound = new Audio(notice);
+      sound.play();
+    };
+    const handleRemoved = (data) => {
+      console.log("del", data);
+      setNewOrders((prev) =>
+        prev.filter((item) => item.orderData.transaction_comment != data)
+      );
+    };
+    socket?.on("message", handleMessage);
+    socket?.on("removeOrder", handleRemoved);
+
+    return () => {
+      socket?.off("message", handleMessage);
+      socket?.off("removeOrder", handleRemoved);
+    };
   }, [socket]);
 
   useEffect(() => {
