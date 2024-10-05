@@ -36,14 +36,15 @@ const OrderDetails = () => {
 
   useEffect(() => {
     const fetchOneOrder = async () => {
+      console.log(myOrder?.orderData?.transaction_comment?.match(/\d+/g)?.join('') || '')
       const { data } = await axios.get(
         `${import.meta.env.VITE_BACK}/get_order/${
           myOrder?.orderData?.transaction_comment
-            ? myOrder?.orderData?.transaction_comment
+            ? `${myOrder?.orderData?.transaction_comment?.match(/\d+/g)?.join('')}` || ''
             : myOrder.order_id
         }`
       );
-      console.log(data);
+      console.log("abd",data);
       setBackOrder(data);
     };
 
@@ -68,7 +69,7 @@ const OrderDetails = () => {
       if (status == "waiting") {
         const resStatus = await axios.put(
           `${import.meta.env.VITE_BACK}/update_order_status/${
-            orderData && +orderData?.transaction_comment
+            orderData && +orderData?.transaction_comment?.match(/\d+/g)?.join('') || ''
           }`,
           JSON.stringify({
             status: "delivery",
@@ -90,7 +91,7 @@ const OrderDetails = () => {
       if (status == "delivery") {
         const resStatus = await axios.put(
           `${import.meta.env.VITE_BACK}/update_order_status/${
-            orderData && +orderData?.transaction_comment
+            orderData && +orderData?.transaction_comment?.match(/\d+/g)?.join('') || ''
           }`,
           JSON.stringify({
             status: "finished",
