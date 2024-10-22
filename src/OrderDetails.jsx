@@ -36,15 +36,19 @@ const OrderDetails = () => {
 
   useEffect(() => {
     const fetchOneOrder = async () => {
-      console.log(myOrder?.orderData?.transaction_comment?.match(/\d+/g)?.join('') || '')
+      console.log(
+        myOrder?.orderData?.transaction_comment?.match(/\d+/g)?.join("") || ""
+      );
       const { data } = await axios.get(
         `${import.meta.env.VITE_BACK}/get_order/${
           myOrder?.orderData?.transaction_comment
-            ? `${myOrder?.orderData?.transaction_comment?.match(/\d+/g)?.join('')}` || ''
+            ? `${myOrder?.orderData?.transaction_comment
+                ?.match(/\d+/g)
+                ?.join("")}` || ""
             : myOrder.order_id
         }`
       );
-      console.log("abd",data);
+      console.log("abd", data);
       setBackOrder(data);
     };
 
@@ -67,52 +71,101 @@ const OrderDetails = () => {
     try {
       setLoading(true);
       if (status == "waiting") {
-        const resStatus = await axios.put(
-          `${import.meta.env.VITE_BACK}/update_order_status/${
-            orderData && +orderData?.transaction_comment?.match(/\d+/g)?.join('') || ''
-          }`,
-          JSON.stringify({
-            status: "delivery",
-          }),
-          { headers }
-        );
-        const mongoChange = await axios.put(
-          `${import.meta.env.VITE_API}/changeStatus/${+id}`,
-          JSON.stringify({
-            status: "delivery",
-          }),
-          { headers }
-        );
-        console.log("mon", mongoChange.data);
-        console.log("res", resStatus.data);
-        setMyOrder({ ...myOrder, status: "delivery" });
-        setLoading(false);
+        try {
+          const [resStatus, mongoChange] = await Promise.allSettled([
+            axios.put(
+              `${import.meta.env.VITE_BACK}/update_order_status/${
+                (orderData &&
+                  +orderData?.transaction_comment?.match(/\d+/g)?.join("")) ||
+                ""
+              }`,
+              JSON.stringify({
+                status: "delivery",
+              }),
+              { headers }
+            ),
+            axios.put(
+              `${import.meta.env.VITE_API}/changeStatus/${+id}`,
+              JSON.stringify({
+                status: "delivery",
+              }),
+              { headers }
+            ),
+          ]);
+
+          // Handle resStatus
+          if (resStatus.status === "fulfilled") {
+            console.log("res", resStatus.value.data);
+          } else {
+            console.error("resStatus failed", resStatus.reason);
+          }
+
+          // Handle mongoChange
+          if (mongoChange.status === "fulfilled") {
+            console.log("mon", mongoChange.value.data);
+          } else {
+            console.error("mongoChange failed", mongoChange.reason);
+          }
+
+          // Update the order status if either request succeeded
+          if (
+            resStatus.status === "fulfilled" ||
+            mongoChange.status === "fulfilled"
+          ) {
+            setMyOrder({ ...myOrder, status: "delivery" });
+          }
+        } catch (error) {
+          console.error("Error in updating status", error);
+        } finally {
+          setLoading(false);
+        }
       }
+
       if (status == "delivery") {
-        const resStatus = await axios.put(
-          `${import.meta.env.VITE_BACK}/update_order_status/${
-            orderData && +orderData?.transaction_comment?.match(/\d+/g)?.join('') || ''
-          }`,
-          JSON.stringify({
-            status: "finished",
-          }),
-          { headers }
-        );
-        const mongoChange = await axios.delete(
-          `${import.meta.env.VITE_API}/deleteOrder/${+id}`
-        );
-        // const deleteBack = await axios.delete(
-        //   `${import.meta.env.VITE_BACK}/delete_order/${
-        //     orderData && +orderData?.transaction_comment
-        //   }`
-        // );
-        // console.log("del", deleteBack.data);
-        console.log("mon", mongoChange.data);
-        console.log("res", resStatus.data);
-        setMyOrder({ ...myOrder, status: "delivery" });
-        setLoading(false);
-        toast.success("Заказ успешно доставлен");
-        navigate("/");
+        try {
+          const [resStatus, mongoChange] = await Promise.allSettled([
+            axios.put(
+              `${import.meta.env.VITE_BACK}/update_order_status/${
+                (orderData &&
+                  +orderData?.transaction_comment?.match(/\d+/g)?.join("")) ||
+                ""
+              }`,
+              JSON.stringify({
+                status: "finished",
+              }),
+              { headers }
+            ),
+            axios.delete(`${import.meta.env.VITE_API}/deleteOrder/${+id}`),
+          ]);
+
+          // Handle resStatus
+          if (resStatus.status === "fulfilled") {
+            console.log("res", resStatus.value.data);
+          } else {
+            console.error("resStatus failed", resStatus.reason);
+          }
+
+          // Handle mongoChange
+          if (mongoChange.status === "fulfilled") {
+            console.log("mon", mongoChange.value.data);
+          } else {
+            console.error("mongoChange failed", mongoChange.reason);
+          }
+
+          // Update the order status if at least one request succeeded
+          if (
+            resStatus.status === "fulfilled" ||
+            mongoChange.status === "fulfilled"
+          ) {
+            setMyOrder({ ...myOrder, status: "delivery" });
+            toast.success("Заказ успешно доставлен");
+            navigate("/");
+          }
+        } catch (error) {
+          console.error("Error in processing order", error);
+        } finally {
+          setLoading(false);
+        }
       }
     } catch (error) {
       setLoading(false);
