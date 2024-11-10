@@ -273,13 +273,16 @@ const OrderDetails = () => {
               <div className="price font-normal text-base flex flex-col gap-2">
                 <span>
                   Итого:{" "}
-                  {backOrder
+                  {/* {backOrder
                     ? f(+backOrder?.all_price / 100)
                     : f(
                         (Number(orderData.sum) -
                           Number(orderData.delivery.delivery_price)) /
                           100
-                      )}{" "}
+                      )}{" "} */}
+                  {backOrder
+                    ? f(+backOrder?.all_price / 100)
+                    : f(Number(orderData.sum) / 100)}{" "}
                   сум
                 </span>
                 <span>
@@ -288,7 +291,7 @@ const OrderDetails = () => {
                 </span>
                 <span>
                   К оплате:{" "}
-                  {backOrder
+                  {/* {backOrder
                     ? f(+backOrder?.payed_sum / 100)
                     : f(
                         (Number(orderData.sum) -
@@ -301,6 +304,15 @@ const OrderDetails = () => {
                             Number(orderData.discount || 1)
                           ) +
                           Number(orderData.delivery.delivery_price)
+                      )}{" "} */}
+                  {backOrder
+                    ? f(+backOrder?.payed_sum / 100)
+                    : f(
+                        Number(orderData.sum) / 100 -
+                          calculatePercentage(
+                            Number(orderData.sum) / 100,
+                            Number(orderData.discount || 1)
+                          )
                       )}{" "}
                   сум
                 </span>
@@ -314,7 +326,7 @@ const OrderDetails = () => {
                     : "-"}{" "}
                 </span>
 
-                <span>Доставка: {f(10000)} сум</span>
+                {/* <span>Доставка: {f(10000)} сум</span> */}
               </div>
             </section>
             <div className="w-full flex justify-end items-center">
