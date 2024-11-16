@@ -18,6 +18,7 @@ const OrderDetails = () => {
   const [backOrder, setBackOrder] = useState(null);
   const [openMap, setOpenMap] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [clientAddress, setclientAddress] = useState([])
   const findOrder = async () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_API}/findOrder/${id}`
@@ -50,6 +51,10 @@ const OrderDetails = () => {
       );
       console.log("abd", data);
       setBackOrder(data);
+      let latitudeLongitude = data?.client_address?.split(",");
+      let lat = parseFloat(latitudeLongitude[0]);
+      let lng = parseFloat(latitudeLongitude[1]);
+      setclientAddress([lat, lng])
     };
 
     if (myOrder) {
@@ -184,8 +189,8 @@ const OrderDetails = () => {
   });
   console.log(spots);
   console.log(myOrder);
-  console.log(orderData);
-  console.log(backOrder);
+  console.log("order", orderData);
+  console.log("back", backOrder);
 
   if (!spots || !myOrder || !orderData) {
     return (
@@ -351,7 +356,7 @@ const OrderDetails = () => {
               <button
                 className="py-1 px-2 bg-primary text-sm rounded-md text-white"
                 onClick={() => {
-                  const url = `https://yandex.ru/maps/?ll=${orderData?.delivery.lng},${orderData?.delivery.lat}&z=14&pt=${orderData?.delivery.lng},${orderData?.delivery.lat},pm2blm~${orderData?.delivery.lng},${orderData?.delivery.lat},pm2ntm`;
+                  const url = `https://yandex.ru/maps/?ll=${clientAddress[1]},${clientAddress[0]}&z=14&pt=${clientAddress[1]},${clientAddress[0]},pm2blm~${clientAddress[1]},${clientAddress[0]},pm2ntm`;
                   window.open(url, "_blank");
                 }}
               >
@@ -364,12 +369,12 @@ const OrderDetails = () => {
                 {openMap ? "Скрыть" : "Показать"} карту
               </button>
             </div>
-            {orderData?.delivery.lat && orderData?.delivery.lng && (
+            {clientAddress.length && (
               <div
                 className={`w-[100%] h-[300px] ${openMap ? "block" : "hidden"}`}
               >
                 <MapContainer
-                  center={[orderData?.delivery?.lat, orderData?.delivery?.lng]}
+                  center={clientAddress}
                   zoom={14}
                   style={{ width: "100%", height: "80%" }}
                 >
@@ -378,10 +383,7 @@ const OrderDetails = () => {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                   <Marker
-                    position={[
-                      orderData?.delivery?.lat,
-                      orderData?.delivery?.lng,
-                    ]}
+                    position={clientAddress}
                     icon={icon}
                   >
                     <Popup>
