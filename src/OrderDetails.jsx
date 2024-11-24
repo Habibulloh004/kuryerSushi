@@ -18,7 +18,7 @@ const OrderDetails = () => {
   const [backOrder, setBackOrder] = useState(null);
   const [openMap, setOpenMap] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [clientAddress, setclientAddress] = useState([])
+  const [clientAddress, setclientAddress] = useState([]);
   const findOrder = async () => {
     const { data } = await axios.get(
       `${import.meta.env.VITE_API}/findOrder/${id}`
@@ -54,7 +54,7 @@ const OrderDetails = () => {
       let latitudeLongitude = data?.client_address?.split(",");
       let lat = parseFloat(latitudeLongitude[0]);
       let lng = parseFloat(latitudeLongitude[1]);
-      setclientAddress([lat, lng])
+      setclientAddress([lat, lng]);
     };
 
     if (myOrder) {
@@ -77,7 +77,7 @@ const OrderDetails = () => {
       setLoading(true);
       if (status == "waiting") {
         try {
-          const [resStatus, mongoChange] = await Promise.allSettled([
+          const [resStatus, mongoChange, notify] = await Promise.allSettled([
             axios.put(
               `${import.meta.env.VITE_BACK}/update_order_status/${
                 (orderData &&
@@ -96,6 +96,11 @@ const OrderDetails = () => {
               }),
               { headers }
             ),
+            axios.post(`${import.meta.env.VITE_API}/notify`, {
+              fcm: backOrder.fcm,
+              fcm_lng: backOrder.fcm_lng,
+              status: "delivery",
+            }),
           ]);
 
           // Handle resStatus
@@ -110,6 +115,12 @@ const OrderDetails = () => {
             console.log("mon", mongoChange.value.data);
           } else {
             console.error("mongoChange failed", mongoChange.reason);
+          }
+
+          if (notify.status === "fulfilled") {
+            console.log("notify", notify.value.data);
+          } else {
+            console.error("notify failed", notify.reason);
           }
 
           // Update the order status if either request succeeded
@@ -128,7 +139,7 @@ const OrderDetails = () => {
 
       if (status == "delivery") {
         try {
-          const [resStatus, mongoChange] = await Promise.allSettled([
+          const [resStatus, mongoChange, notify] = await Promise.allSettled([
             axios.put(
               `${import.meta.env.VITE_BACK}/update_order_status/${
                 (orderData &&
@@ -141,6 +152,11 @@ const OrderDetails = () => {
               { headers }
             ),
             axios.delete(`${import.meta.env.VITE_API}/deleteOrder/${+id}`),
+            axios.post(`${import.meta.env.VITE_API}/notify`, {
+              fcm: backOrder.fcm,
+              fcm_lng: backOrder.fcm_lng,
+              status: "finished",
+            }),
           ]);
 
           // Handle resStatus
@@ -148,6 +164,11 @@ const OrderDetails = () => {
             console.log("res", resStatus.value.data);
           } else {
             console.error("resStatus failed", resStatus.reason);
+          }
+          if (notify.status === "fulfilled") {
+            console.log("notify", notify.value.data);
+          } else {
+            console.error("notify failed", notify.reason);
           }
 
           // Handle mongoChange
@@ -382,10 +403,7 @@ const OrderDetails = () => {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  <Marker
-                    position={clientAddress}
-                    icon={icon}
-                  >
+                  <Marker position={clientAddress} icon={icon}>
                     <Popup>
                       <h3>hello I am client</h3>
                     </Popup>
