@@ -277,7 +277,7 @@ const OrderDetails = () => {
               <p className="text-ellipsis whitespace-nowrap w-full overflow-hidden">
                 Адрес клиента: <br />{" "}
                 <span className="font-normal">
-                  {orderData?.delivery.address1}
+                  {orderData?.delivery ? orderData?.delivery.address1 : "-"}
                 </span>
               </p>
               <span>
@@ -390,7 +390,7 @@ const OrderDetails = () => {
                 {openMap ? "Скрыть" : "Показать"} карту
               </button>
             </div>
-            {clientAddress.length && (
+            {clientAddress.length > 0 && (
               <div
                 className={`w-[100%] h-[300px] ${openMap ? "block" : "hidden"}`}
               >
