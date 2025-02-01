@@ -8,7 +8,7 @@ import { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { f } from "./utils";
+import { f, formatPhoneNumber } from "./utils";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -247,6 +247,11 @@ const OrderDetails = () => {
     return (number * percent) / 100;
   }
 
+  function extractPhoneNumber(text) {
+    const match = text.match(/\+\d+/);
+    return match ? match[0] : null;
+  }
+
   return (
     <main>
       <div className="container w-10/12 mx-auto mt-6 h-[85dvh]">
@@ -269,9 +274,19 @@ const OrderDetails = () => {
                 Номер клиента:{" "}
                 <a
                   className="font-normal"
-                  href={`tel:${orderData?.client_phone?.replace(/\s/g, "")}`}
+                  href={`tel:${
+                    backOrder &&
+                    backOrder.phone &&
+                    backOrder.phone == "+998771052018"
+                      ? extractPhoneNumber(backOrder.comment)
+                      : orderData?.client_phone?.replace(/\s/g, "")
+                  }`}
                 >
-                  {orderData?.client_phone}
+                  {backOrder &&
+                  backOrder.phone &&
+                  backOrder.phone == "+998771052018"
+                    ? formatPhoneNumber(extractPhoneNumber(backOrder.comment))
+                    : orderData?.client_phone}
                 </a>
               </p>
               <p className="text-ellipsis whitespace-nowrap w-full overflow-hidden">
